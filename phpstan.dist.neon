@@ -5,5 +5,7 @@ parameters:
         - tests/
     bootstrapFiles:
         - vendor/autoload.php
+    ignoreErrors:
+        - '#Property App\\Entity\\Company::\$id is never written, only read.#'
     excludePaths:
         - tests/bootstrap.php

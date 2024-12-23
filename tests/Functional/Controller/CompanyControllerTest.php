@@ -105,6 +105,8 @@ final class CompanyControllerTest extends WebTestCase
 
     /**
      * @dataProvider provideNewCompanyEmptyPayloads
+     * @param array<string, mixed> $expectedResponse
+     * @param array<string, string> $payload
      */
     public function testIfCompanyNewPayloadValidation(array $payload, array $expectedResponse): void
     {
@@ -222,6 +224,9 @@ final class CompanyControllerTest extends WebTestCase
         self::assertEquals('Please look into api/doc for more information.', $responseContent['moreInfo']);
     }
 
+    /**
+     * @return array<int, array<string, array<string, mixed>>>
+     */
     public static function provideNewCompanyEmptyPayloads(): array
     {
         return [
