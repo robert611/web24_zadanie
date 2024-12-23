@@ -55,6 +55,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "code-check": [
+            "./vendor/bin/phpcs",
+            "./vendor/bin/phpstan analyse -l 6 src tests",
+            "./vendor/bin/phpunit"
         ]
     },
     "conflict": {
