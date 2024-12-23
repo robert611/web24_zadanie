@@ -139,6 +139,16 @@ class Company implements JsonSerializable
         return $company;
     }
 
+    public function update(string $name, string $nip, string $address, string $city, string $zipCode): void
+    {
+        $this->name = $name;
+        $this->nip = $nip;
+        $this->address = $address;
+        $this->city = $city;
+        $this->zipCode = $zipCode;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
     /**
      * @return array<string, mixed>
      */

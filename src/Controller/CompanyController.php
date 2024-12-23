@@ -148,13 +148,97 @@ final class CompanyController extends AbstractController
         $company = $this->companyRepository->find($id);
 
         if (null === $company) {
-            return new JsonResponse([
-                'developerMessage' => 'Company not found',
-                'userMessage' => 'Company not found',
-                'errorCode' => Response::HTTP_NOT_FOUND,
-                'moreInfo' => 'Please look into api/doc for more information.'
-            ], Response::HTTP_NOT_FOUND);
+            return $this->formatCompanyNotFoundResponse();
         }
+
+        return new JsonResponse($company, Response::HTTP_OK);
+    }
+
+    #[Route('/{id}', name: 'company_edit', methods: ['PUT'])]
+    #[OA\Put(
+        description: 'Updates company',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'name', type: 'string'),
+                    new OA\Property(property: 'nip', type: 'string'),
+                    new OA\Property(property: 'address', type: 'string'),
+                    new OA\Property(property: 'city', type: 'string'),
+                    new OA\Property(property: 'zipCode', type: 'string'),
+                ],
+                type: 'object',
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Updated company',
+                content: new OA\JsonContent(
+                    ref: new Model(type: Company::class, groups: ['company_read'])
+                ),
+            ),
+        ],
+    )]
+    public function edit(int $id, Request $request): Response
+    {
+        $company = $this->companyRepository->find($id);
+
+        if (null === $company) {
+            return $this->formatCompanyNotFoundResponse();
+        }
+
+        if (empty($request->getContent())) {
+            return $this->formatBadRequestResponse('Payload cannot be empty');
+        }
+
+        try {
+            $requestBody = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $this->formatBadRequestResponse('Invalid json payload');
+        }
+
+        $name = $requestBody['name'] ?? null;
+        $nip = $requestBody['nip'] ?? null;
+        $address = $requestBody['address'] ?? null;
+        $city = $requestBody['city'] ?? null;
+        $zipCode = $requestBody['zipCode'] ?? null;
+
+        if (empty($name)) {
+            return $this->formatBadRequestResponse('Name cannot be null or empty');
+        }
+
+        if (empty($nip)) {
+            return $this->formatBadRequestResponse('Nip cannot be null or empty');
+        }
+
+        if (empty($address)) {
+            return $this->formatBadRequestResponse('Address cannot be null or empty');
+        }
+
+        if (empty($city)) {
+            return $this->formatBadRequestResponse('City cannot be null or empty');
+        }
+
+        if (empty($zipCode)) {
+            return $this->formatBadRequestResponse('Zip code cannot be null or empty');
+        }
+
+        $company->update(
+            $name,
+            $nip,
+            $address,
+            $city,
+            $zipCode,
+        );
+
+        $errors = $this->validator->validate($company);
+
+        if ($errors->count() > 0) {
+            return $this->formatBadRequestResponse(FormHelper::mapValidationErrorsToPlainString($errors));
+        }
+
+        $this->entityManager->flush();
 
         return new JsonResponse($company, Response::HTTP_OK);
     }
@@ -167,5 +251,15 @@ final class CompanyController extends AbstractController
             'errorCode' => Response::HTTP_BAD_REQUEST,
             'moreInfo' => 'Please look into api/doc for more information.'
         ], Response::HTTP_BAD_REQUEST);
+    }
+
+    public function formatCompanyNotFoundResponse(): JsonResponse
+    {
+        return new JsonResponse([
+            'developerMessage' => 'Company not found',
+            'userMessage' => 'Company not found',
+            'errorCode' => Response::HTTP_NOT_FOUND,
+            'moreInfo' => 'Please look into api/doc for more information.'
+        ], Response::HTTP_NOT_FOUND);
     }
 }
