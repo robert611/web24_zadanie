@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Table;
 use JsonSerializable;
 use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[Table(name: 'company')]
@@ -19,38 +20,69 @@ class Company implements JsonSerializable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
-    #[Groups(["company_read"])]
+    #[Groups(['company_read'])]
     private int $id;
 
-    #[ORM\Column(name: "name", type: 'string', length: 255, nullable: false)]
-    #[Groups(["company_read"])]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
+    #[Groups(['company_read'])]
+    #[Assert\NotBlank(message: 'Company name cannot be empty.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Name must contain at least {{ limit }} characters.',
+        maxMessage: 'Name must contain maximum {{ limit }} characters.',
+    )]
     #[OA\Property(description: 'Name must contain at least three, and maximum of 255 characters.')]
     private string $name;
 
-    #[ORM\Column(name: "nip", type: 'string', length: 10, nullable: false)]
-    #[Groups(["company_read"])]
+    #[ORM\Column(name: 'nip', type: 'string', length: 10, nullable: false)]
+    #[Groups(['company_read'])]
+    #[Assert\NotBlank(message: 'Nip cannot be empty.')]
+    #[Assert\Regex(
+        pattern: '/^\d{10}$/',
+        message: 'Nip must consist of exactly ten digits.'
+    )]
     #[OA\Property(description: 'Nip must consist of ten digits without dashes in between.')]
     private string $nip;
 
-    #[ORM\Column(name: "address", type: 'string', length: 255, nullable: false)]
-    #[Groups(["company_read"])]
-    #[OA\Property(description: 'Name must contain at least three, and maximum of 255 characters.')]
+    #[ORM\Column(name: 'address', type: 'string', length: 255, nullable: false)]
+    #[Groups(['company_read'])]
+    #[Assert\NotBlank(message: 'Address cannot be empty.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Address must contain at least {{ limit }} characters.',
+        maxMessage: 'Address must contain maximum {{ limit }} characters.',
+    )]
+    #[OA\Property(description: 'Address must contain at least three, and maximum of 255 characters.')]
     private string $address;
 
     #[ORM\Column(name: "city", type: 'string', length: 64, nullable: false)]
-    #[Groups(["company_read"])]
-    #[OA\Property(description: 'Name must contain at least two, and maximum of 64 characters.')]
+    #[Groups(['company_read'])]
+    #[Assert\NotBlank(message: "City name cannot be empty.")]
+    #[Assert\Length(
+        min: 2,
+        max: 64,
+        minMessage: 'City name must contain at least {{ limit }} characters.',
+        maxMessage: 'City name must contain maximum {{ limit }} characters.',
+    )]
+    #[OA\Property(description: 'City name must contain at least two, and maximum of 64 characters.')]
     private string $city;
 
-    #[ORM\Column(name: "zip_code", type: 'string', length: 6, nullable: false)]
-    #[Groups(["company_read"])]
+    #[ORM\Column(name: 'zip_code', type: 'string', length: 6, nullable: false)]
+    #[Groups(['company_read'])]
+    #[Assert\NotBlank(message: "Zip code cannot be empty.")]
+    #[Assert\Regex(
+        pattern: '/^\d{2}-\d{3}$/',
+        message: "Zip code must be in XX-XXX format."
+    )]
     #[OA\Property(description: 'Zip code must be in XX-XXX format.')]
     private string $zipCode;
 
-    #[ORM\Column(name: "created_at", type: 'datetime_immutable', nullable: false)]
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
     private DateTimeImmutable $createdAt;
 
-    #[ORM\Column(name: "updated_at", type: 'datetime_immutable', nullable: false)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false)]
     private DateTimeImmutable $updatedAt;
 
     public function getId(): int
