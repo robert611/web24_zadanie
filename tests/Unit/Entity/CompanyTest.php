@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Company;
+use App\Entity\Employee;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -58,5 +59,45 @@ final class CompanyTest extends TestCase
         self::assertEquals("Brzozowa 28", $company->getAddress());
         self::assertEquals("Sopot", $company->getCity());
         self::assertEquals("90-333", $company->getZipCode());
+    }
+
+    /**
+     * @test
+     */
+    public function canAddEmployees(): void
+    {
+        // given
+        $company = Company::create(
+            'General Dynamics',
+            '0224111111',
+            'Lazurowa 48/10',
+            'Poznań',
+            '60-001',
+        );
+
+        $employee1 = Employee::create(
+            $company,
+            'John',
+            'Doe',
+            'john.do@example.com',
+            '989765333',
+        );
+
+        $employee2 = Employee::create(
+            $company,
+            'Marta',
+            'Doe',
+            'marta.do@example.com',
+            '111765876',
+        );
+
+        // when
+        $company->addEmployee($employee1);
+        $company->addEmployee($employee2);
+
+        // then
+        $companyEmployees = $company->getEmployees();
+        self::assertEquals($employee1, $companyEmployees[0]);
+        self::assertEquals($employee2, $companyEmployees[1]);
     }
 }

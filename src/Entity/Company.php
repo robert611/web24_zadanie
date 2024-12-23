@@ -6,6 +6,8 @@ namespace App\Entity;
 
 use App\Repository\CompanyRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 use JsonSerializable;
@@ -85,6 +87,14 @@ class Company implements JsonSerializable
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false)]
     private DateTimeImmutable $updatedAt;
 
+    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'company', cascade: ['persist', 'remove'])]
+    private Collection $employees;
+
+    public function __construct()
+    {
+        $this->employees = new ArrayCollection();
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -123,6 +133,19 @@ class Company implements JsonSerializable
     public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    public function addEmployee(Employee $employee): void
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->addToCompany($this);
+        }
     }
 
     public static function create(string $name, string $nip, string $address, string $city, string $zipCode): self

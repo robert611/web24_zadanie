@@ -1,0 +1,106 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity;
+
+use App\Repository\EmployeeRepository;
+use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+
+#[ORM\Entity(repositoryClass: EmployeeRepository::class)]
+#[Table(name: 'employee')]
+class Employee
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    private int $id;
+
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'employees')]
+    #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private Company $company;
+
+    #[ORM\Column(name: 'first_name', type: 'string', length: 255, nullable: false)]
+    private string $firstName;
+
+    #[ORM\Column(name: 'last_name', type: 'string', length: 255, nullable: false)]
+    private string $lastName;
+
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: false)]
+    private string $email;
+
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
+    private ?string $phoneNumber = null;
+
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
+    private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false)]
+    private DateTimeImmutable $updatedAt;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public static function create(
+        Company $company,
+        string $firstName,
+        string $lastName,
+        string $email,
+        string $phoneNumber,
+    ): Employee {
+        $employee = new self();
+        $employee->company = $company;
+        $employee->firstName = $firstName;
+        $employee->lastName = $lastName;
+        $employee->email = $email;
+        $employee->phoneNumber = $phoneNumber;
+        $employee->createdAt = new DateTimeImmutable();
+        $employee->updatedAt = new DateTimeImmutable();
+
+        return $employee;
+    }
+
+    public function addToCompany(Company $company): void
+    {
+        $this->company = $company;
+    }
+}
