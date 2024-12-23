@@ -74,13 +74,13 @@ final class CompanyController extends AbstractController
     public function new(Request $request): Response
     {
         if (empty($request->getContent())) {
-            return new JsonResponse('Payload cannot be empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Payload cannot be empty');
         }
 
         try {
             $requestBody = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
-            return new JsonResponse('Invalid json payload', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Invalid json payload');
         }
 
         $name = $requestBody['name'] ?? null;
@@ -90,23 +90,23 @@ final class CompanyController extends AbstractController
         $zipCode = $requestBody['zipCode'] ?? null;
 
         if (empty($name)) {
-            return new JsonResponse('Name cannot be null or empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Name cannot be null or empty');
         }
 
         if (empty($nip)) {
-            return new JsonResponse('Nip cannot be null or empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Nip cannot be null or empty');
         }
 
         if (empty($address)) {
-            return new JsonResponse('Address cannot be null or empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Address cannot be null or empty');
         }
 
         if (empty($city)) {
-            return new JsonResponse('City cannot be null or empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('City cannot be null or empty');
         }
 
         if (empty($zipCode)) {
-            return new JsonResponse('Zip code cannot be null or empty', Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse('Zip code cannot be null or empty');
         }
 
         $company = Company::create(
@@ -120,12 +120,22 @@ final class CompanyController extends AbstractController
         $errors = $this->validator->validate($company);
 
         if ($errors->count() > 0) {
-            return new JsonResponse(FormHelper::mapValidationErrorsToPlainString($errors), Response::HTTP_BAD_REQUEST);
+            return $this->formatBadRequestResponse(FormHelper::mapValidationErrorsToPlainString($errors));
         }
 
         $this->entityManager->persist($company);
         $this->entityManager->flush();
 
         return new JsonResponse($company, Response::HTTP_CREATED);
+    }
+
+    public function formatBadRequestResponse(string $message): JsonResponse
+    {
+        return new JsonResponse([
+            'developerMessage' => $message,
+            'userMessage' => $message,
+            'errorCode' => Response::HTTP_BAD_REQUEST,
+            'moreInfo' => 'Please look into api/doc for more information.'
+        ], Response::HTTP_BAD_REQUEST);
     }
 }

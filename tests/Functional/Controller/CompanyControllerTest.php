@@ -106,7 +106,7 @@ final class CompanyControllerTest extends WebTestCase
     /**
      * @dataProvider provideNewCompanyEmptyPayloads
      */
-    public function testIfCompanyNewPayloadValidation(array $payload, string $expectedMessage): void
+    public function testIfCompanyNewPayloadValidation(array $payload, array $expectedResponse): void
     {
         // when
         $this->client->request(
@@ -123,7 +123,7 @@ final class CompanyControllerTest extends WebTestCase
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        self::assertEquals($expectedMessage, $responseContent);
+        self::assertEquals($expectedResponse, $responseContent);
     }
 
     public function testIfPayloadCannotBeEmpty(): void
@@ -142,7 +142,12 @@ final class CompanyControllerTest extends WebTestCase
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        self::assertEquals('Payload cannot be empty', $responseContent);
+        self::assertEquals([
+            'developerMessage' => 'Payload cannot be empty',
+            'userMessage' => 'Payload cannot be empty',
+            'errorCode' => Response::HTTP_BAD_REQUEST,
+            'moreInfo' => 'Please look into api/doc for more information.',
+        ], $responseContent);
     }
 
     public function testIfPayloadMustBeValid(): void
@@ -162,7 +167,12 @@ final class CompanyControllerTest extends WebTestCase
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        self::assertEquals('Invalid json payload', $responseContent);
+        self::assertEquals([
+            'developerMessage' => 'Invalid json payload',
+            'userMessage' => 'Invalid json payload',
+            'errorCode' => Response::HTTP_BAD_REQUEST,
+            'moreInfo' => 'Please look into api/doc for more information.',
+        ], $responseContent);
     }
 
     public static function provideNewCompanyEmptyPayloads(): array
@@ -172,20 +182,35 @@ final class CompanyControllerTest extends WebTestCase
                 'payload' => [
                     'name' => '',
                 ],
-                'expectedMessage' => 'Name cannot be null or empty',
+                'expectedResponse' => [
+                    'developerMessage' => 'Name cannot be null or empty',
+                    'userMessage' => 'Name cannot be null or empty',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
                     'name' => 'Temu',
                 ],
-                'expectedMessage' => 'Nip cannot be null or empty',
+                'expectedResponse' => [
+                    'developerMessage' => 'Nip cannot be null or empty',
+                    'userMessage' => 'Nip cannot be null or empty',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
                     'name' => 'Temu',
                     'nip' => '1234567890',
                 ],
-                'expectedMessage' => 'Address cannot be null or empty',
+                'expectedResponse' => [
+                    'developerMessage' => 'Address cannot be null or empty',
+                    'userMessage' => 'Address cannot be null or empty',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -193,7 +218,12 @@ final class CompanyControllerTest extends WebTestCase
                     'nip' => '1234567890',
                     'address' => 'Lisi Ogon',
                 ],
-                'expectedMessage' => 'City cannot be null or empty',
+                'expectedResponse' => [
+                    'developerMessage' => 'City cannot be null or empty',
+                    'userMessage' => 'City cannot be null or empty',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -202,7 +232,12 @@ final class CompanyControllerTest extends WebTestCase
                     'address' => 'Lisi Ogon',
                     'city' => 'Lublin',
                 ],
-                'expectedMessage' => 'Zip code cannot be null or empty',
+                'expectedResponse' => [
+                    'developerMessage' => 'Zip code cannot be null or empty',
+                    'userMessage' => 'Zip code cannot be null or empty',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -212,7 +247,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'Name must contain at least 3 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Name must contain at least 3 characters.',
+                    'userMessage' => 'Name must contain at least 3 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -222,7 +262,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'Name must contain maximum 255 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Name must contain maximum 255 characters.',
+                    'userMessage' => 'Name must contain maximum 255 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -232,7 +277,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'Nip must consist of exactly ten digits.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Nip must consist of exactly ten digits.',
+                    'userMessage' => 'Nip must consist of exactly ten digits.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -242,7 +292,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'Address must contain at least 3 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Address must contain at least 3 characters.',
+                    'userMessage' => 'Address must contain at least 3 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -252,7 +307,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'Address must contain maximum 255 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Address must contain maximum 255 characters.',
+                    'userMessage' => 'Address must contain maximum 255 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -262,7 +322,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'L',
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'City name must contain at least 2 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'City name must contain at least 2 characters.',
+                    'userMessage' => 'City name must contain at least 2 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -272,7 +337,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => str_repeat('1', 65),
                     'zipCode' => '25-555',
                 ],
-                'expectedMessage' => 'City name must contain maximum 64 characters.',
+                'expectedResponse' => [
+                    'developerMessage' => 'City name must contain maximum 64 characters.',
+                    'userMessage' => 'City name must contain maximum 64 characters.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
             [
                 'payload' => [
@@ -282,7 +352,12 @@ final class CompanyControllerTest extends WebTestCase
                     'city' => 'Lublin',
                     'zipCode' => '254-555',
                 ],
-                'expectedMessage' => 'Zip code must be in XX-XXX format.',
+                'expectedResponse' => [
+                    'developerMessage' => 'Zip code must be in XX-XXX format.',
+                    'userMessage' => 'Zip code must be in XX-XXX format.',
+                    'errorCode' => Response::HTTP_BAD_REQUEST,
+                    'moreInfo' => 'Please look into api/doc for more information.'
+                ],
             ],
         ];
     }
