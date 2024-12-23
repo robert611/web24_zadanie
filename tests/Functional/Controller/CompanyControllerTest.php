@@ -23,7 +23,7 @@ final class CompanyControllerTest extends WebTestCase
         $this->companyRepository = self::getContainer()->get(CompanyRepository::class);
     }
 
-    public function testIndex(): void
+    public function testList(): void
     {
         // given
         $this->fixtures->aCompany(
@@ -43,7 +43,7 @@ final class CompanyControllerTest extends WebTestCase
         );
 
         // when
-        $this->client->request('GET', '/api/company/index');
+        $this->client->request('GET', '/api/companies');
 
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
@@ -74,7 +74,7 @@ final class CompanyControllerTest extends WebTestCase
         // when
         $this->client->request(
             method: 'POST',
-            uri: 'api/company/new',
+            uri: 'api/companies',
             server: [
                 'content-type' => 'application/json',
                 'accept' => 'application/json',
@@ -111,7 +111,7 @@ final class CompanyControllerTest extends WebTestCase
         // when
         $this->client->request(
             method: 'POST',
-            uri: 'api/company/new',
+            uri: 'api/companies',
             server: [
                 'content-type' => 'application/json',
                 'accept' => 'application/json',
@@ -131,7 +131,7 @@ final class CompanyControllerTest extends WebTestCase
         // when
         $this->client->request(
             method: 'POST',
-            uri: 'api/company/new',
+            uri: 'api/companies',
             server: [
                 'content-type' => 'application/json',
                 'accept' => 'application/json',
@@ -150,7 +150,7 @@ final class CompanyControllerTest extends WebTestCase
         // when
         $this->client->request(
             method: 'POST',
-            uri: 'api/company/new',
+            uri: 'api/companies',
             server: [
                 'content-type' => 'application/json',
                 'accept' => 'application/json',

@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/api/company')]
+#[Route('/api/companies')]
 final class CompanyController extends AbstractController
 {
     public function __construct(
@@ -28,7 +28,7 @@ final class CompanyController extends AbstractController
     ) {
     }
 
-    #[Route('/index', name: 'company_index', methods: ['GET'])]
+    #[Route('', name: 'company_index', methods: ['GET'])]
     #[OA\Response(
         response: 200,
         description: 'Returns companies list',
@@ -37,14 +37,14 @@ final class CompanyController extends AbstractController
             items: new OA\Items(ref: new Model(type: Company::class, groups: ['company_read']))
         ),
     )]
-    public function index(): Response
+    public function list(): Response
     {
         $companies = $this->companyRepository->findAll();
 
-        return new JsonResponse($companies);
+        return new JsonResponse($companies, Response::HTTP_OK);
     }
 
-    #[Route('/new', name: 'company_new', methods: ['POST'])]
+    #[Route('', name: 'company_new', methods: ['POST'])]
     #[OA\Post(
         description: 'Creates a new company',
         requestBody: new OA\RequestBody(
