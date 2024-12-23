@@ -9,6 +9,8 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[Table(name: 'company')]
@@ -17,21 +19,32 @@ class Company implements JsonSerializable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[Groups(["company_read"])]
     private int $id;
 
     #[ORM\Column(name: "name", type: 'string', length: 255, nullable: false)]
+    #[Groups(["company_read"])]
+    #[OA\Property(description: 'Name must contain at least three, and maximum of 255 characters.')]
     private string $name;
 
     #[ORM\Column(name: "nip", type: 'string', length: 10, nullable: false)]
+    #[Groups(["company_read"])]
+    #[OA\Property(description: 'Nip must consist of ten digits without dashes in between.')]
     private string $nip;
 
     #[ORM\Column(name: "address", type: 'string', length: 255, nullable: false)]
+    #[Groups(["company_read"])]
+    #[OA\Property(description: 'Name must contain at least three, and maximum of 255 characters.')]
     private string $address;
 
     #[ORM\Column(name: "city", type: 'string', length: 64, nullable: false)]
+    #[Groups(["company_read"])]
+    #[OA\Property(description: 'Name must contain at least two, and maximum of 64 characters.')]
     private string $city;
 
     #[ORM\Column(name: "zip_code", type: 'string', length: 6, nullable: false)]
+    #[Groups(["company_read"])]
+    #[OA\Property(description: 'Zip code must be in XX-XXX format.')]
     private string $zipCode;
 
     #[ORM\Column(name: "created_at", type: 'datetime_immutable', nullable: false)]

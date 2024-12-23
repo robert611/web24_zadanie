@@ -39,7 +39,7 @@ final class CompanyControllerTest extends WebTestCase
         );
 
         // when
-        $this->client->request('GET', '/company/index');
+        $this->client->request('GET', '/api/company/index');
 
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
