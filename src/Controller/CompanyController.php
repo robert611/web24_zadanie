@@ -28,7 +28,7 @@ final class CompanyController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'company_index', methods: ['GET'])]
+    #[Route('', name: 'company_list', methods: ['GET'])]
     #[OA\Response(
         response: 200,
         description: 'Returns companies list',

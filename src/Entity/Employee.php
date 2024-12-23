@@ -8,30 +8,38 @@ use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
+use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 #[Table(name: 'employee')]
-class Employee
+class Employee implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[Groups(['employee_read'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'employees')]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['employee_read'])]
     private Company $company;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 255, nullable: false)]
+    #[Groups(['employee_read'])]
     private string $firstName;
 
     #[ORM\Column(name: 'last_name', type: 'string', length: 255, nullable: false)]
+    #[Groups(['employee_read'])]
     private string $lastName;
 
     #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: false)]
+    #[Groups(['employee_read'])]
     private string $email;
 
     #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
+    #[Groups(['employee_read'])]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
@@ -85,7 +93,7 @@ class Employee
         string $firstName,
         string $lastName,
         string $email,
-        string $phoneNumber,
+        ?string $phoneNumber = null,
     ): Employee {
         $employee = new self();
         $employee->company = $company;
@@ -102,5 +110,20 @@ class Employee
     public function addToCompany(Company $company): void
     {
         $this->company = $company;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'email' => $this->email,
+            'phoneNumber' => $this->phoneNumber,
+            'company' => $this->company->jsonSerialize(),
+        ];
     }
 }

@@ -22,11 +22,11 @@ class Company implements JsonSerializable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     private int $id;
 
     #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     #[Assert\NotBlank(message: 'Company name cannot be empty.')]
     #[Assert\Length(
         min: 3,
@@ -38,7 +38,7 @@ class Company implements JsonSerializable
     private string $name;
 
     #[ORM\Column(name: 'nip', type: 'string', length: 10, nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     #[Assert\NotBlank(message: 'Nip cannot be empty.')]
     #[Assert\Regex(
         pattern: '/^\d{10}$/',
@@ -48,7 +48,7 @@ class Company implements JsonSerializable
     private string $nip;
 
     #[ORM\Column(name: 'address', type: 'string', length: 255, nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     #[Assert\NotBlank(message: 'Address cannot be empty.')]
     #[Assert\Length(
         min: 3,
@@ -60,7 +60,7 @@ class Company implements JsonSerializable
     private string $address;
 
     #[ORM\Column(name: "city", type: 'string', length: 64, nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     #[Assert\NotBlank(message: "City name cannot be empty.")]
     #[Assert\Length(
         min: 2,
@@ -72,7 +72,7 @@ class Company implements JsonSerializable
     private string $city;
 
     #[ORM\Column(name: 'zip_code', type: 'string', length: 6, nullable: false)]
-    #[Groups(['company_read'])]
+    #[Groups(['company_read', 'employee_read'])]
     #[Assert\NotBlank(message: "Zip code cannot be empty.")]
     #[Assert\Regex(
         pattern: '/^\d{2}-\d{3}$/',
