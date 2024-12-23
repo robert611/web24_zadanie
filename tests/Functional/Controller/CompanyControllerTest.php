@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
+use App\Repository\CompanyRepository;
 use App\Tests\Fixtures\Fixtures;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -13,11 +14,13 @@ final class CompanyControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private Fixtures $fixtures;
+    private CompanyRepository $companyRepository;
 
     public function setUp(): void
     {
         $this->client = self::createClient();
         $this->fixtures = self::getContainer()->get(Fixtures::class);
+        $this->companyRepository = self::getContainer()->get(CompanyRepository::class);
     }
 
     public function testList(): void
@@ -100,6 +103,50 @@ final class CompanyControllerTest extends WebTestCase
     {
         // when
         $this->client->request('GET', "/api/companies/100");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertEquals('Company not found', $responseContent['developerMessage']);
+        self::assertEquals('Company not found', $responseContent['userMessage']);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $responseContent['errorCode']);
+        self::assertEquals('Please look into api/doc for more information.', $responseContent['moreInfo']);
+    }
+
+    /**
+     * @test
+     */
+    public function canDeleteCompany(): void
+    {
+        // given
+        $company = $this->fixtures->aCompany(
+            "Marco Polo",
+            "6574839201",
+            "Lubelska 7a",
+            "Elbląg",
+            "35-733",
+        );
+
+        // when
+        $this->client->request('DELETE', "/api/companies/{$company->getId()}");
+
+        json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertResponseIsSuccessful();
+
+        // and then
+        self::assertEquals(0, $this->companyRepository->count());
+    }
+
+    /**
+     * @test
+     */
+    public function willHandle404ForDeleteCompany(): void
+    {
+        // when
+        $this->client->request('DELETE', "/api/companies/100");
 
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 

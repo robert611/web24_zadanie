@@ -243,6 +243,21 @@ final class CompanyController extends AbstractController
         return new JsonResponse($company, Response::HTTP_OK);
     }
 
+    #[Route('/{id}', name: 'company_delete', methods: ['DELETE'])]
+    public function delete(int $id): Response
+    {
+        $company = $this->companyRepository->find($id);
+
+        if (null === $company) {
+            return $this->formatCompanyNotFoundResponse();
+        }
+
+        $this->entityManager->remove($company);
+        $this->entityManager->flush();
+
+        return new JsonResponse('Company removed', Response::HTTP_NO_CONTENT);
+    }
+
     public function formatBadRequestResponse(string $message): JsonResponse
     {
         return new JsonResponse([
