@@ -175,6 +175,53 @@ final class CompanyControllerTest extends WebTestCase
         ], $responseContent);
     }
 
+    /**
+     * @test
+     */
+    public function canShowSingleCompany(): void
+    {
+        // given
+        $company = $this->fixtures->aCompany(
+            "Marco Polo",
+            "6574839201",
+            "Lubelska 7a",
+            "Elbląg",
+            "35-733",
+        );
+
+        // when
+        $this->client->request('GET', "/api/companies/{$company->getId()}");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertResponseIsSuccessful();
+        self::assertEquals($company->getId(), $responseContent['id']);
+        self::assertEquals('Marco Polo', $responseContent['name']);
+        self::assertEquals('6574839201', $responseContent['nip']);
+        self::assertEquals('Lubelska 7a', $responseContent['address']);
+        self::assertEquals('Elbląg', $responseContent['city']);
+        self::assertEquals('35-733', $responseContent['zipCode']);
+    }
+
+    /**
+     * @test
+     */
+    public function willHandle404ForSingleCompany(): void
+    {
+        // when
+        $this->client->request('GET', "/api/companies/100");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertEquals('Company not found', $responseContent['developerMessage']);
+        self::assertEquals('Company not found', $responseContent['userMessage']);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $responseContent['errorCode']);
+        self::assertEquals('Please look into api/doc for more information.', $responseContent['moreInfo']);
+    }
+
     public static function provideNewCompanyEmptyPayloads(): array
     {
         return [

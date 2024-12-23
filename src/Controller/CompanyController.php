@@ -129,6 +129,36 @@ final class CompanyController extends AbstractController
         return new JsonResponse($company, Response::HTTP_CREATED);
     }
 
+    #[Route('/{id}', name: 'company_show', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns single company',
+        content: new OA\JsonContent(
+            ref: new Model(type: Company::class, groups: ['company_read'])
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'Company id',
+        in: 'path',
+        schema: new OA\Schema(type: 'string')
+    )]
+    public function show(int $id): Response
+    {
+        $company = $this->companyRepository->find($id);
+
+        if (null === $company) {
+            return new JsonResponse([
+                'developerMessage' => 'Company not found',
+                'userMessage' => 'Company not found',
+                'errorCode' => Response::HTTP_NOT_FOUND,
+                'moreInfo' => 'Please look into api/doc for more information.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($company, Response::HTTP_OK);
+    }
+
     public function formatBadRequestResponse(string $message): JsonResponse
     {
         return new JsonResponse([
