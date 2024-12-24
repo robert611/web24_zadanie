@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 use JsonSerializable;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 #[Table(name: 'employee')]
@@ -26,20 +27,23 @@ class Employee implements JsonSerializable
     #[Groups(['employee_read'])]
     private Company $company;
 
-    #[ORM\Column(name: 'first_name', type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(name: 'first_name', type: 'string', length: 86, nullable: false)]
     #[Groups(['employee_read'])]
+    #[OA\Property(description: 'First name must contain at least three, and maximum of 86 characters.')]
     private string $firstName;
 
-    #[ORM\Column(name: 'last_name', type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(name: 'last_name', type: 'string', length: 86, nullable: false)]
     #[Groups(['employee_read'])]
+    #[OA\Property(description: 'Last name must contain at least three, and maximum of 86 characters.')]
     private string $lastName;
 
     #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: false)]
     #[Groups(['employee_read'])]
     private string $email;
 
-    #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 64, nullable: true)]
     #[Groups(['employee_read'])]
+    #[OA\Property(description: 'Phone number must be a valid Polish number in the format "+48 123 456 789".')]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]

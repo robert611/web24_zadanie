@@ -111,7 +111,7 @@ final class CreateCompanyTest extends WebTestCase
      * @param array<string, mixed> $expectedResponse
      * @param array<string, string> $payload
      */
-    public function testIfCompanyNewPayloadValidation(array $payload, array $expectedResponse): void
+    public function testNewCompanyPayloadValidation(array $payload, array $expectedResponse): void
     {
         // when
         $this->client->request(

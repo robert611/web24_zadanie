@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Repository\CompanyRepository;
-use App\Shared\FormHelper;
+use App\Shared\ValidationHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -120,7 +120,7 @@ final class CompanyController extends AbstractController
         $errors = $this->validator->validate($company);
 
         if ($errors->count() > 0) {
-            return $this->formatBadRequestResponse(FormHelper::mapValidationErrorsToPlainString($errors));
+            return $this->formatBadRequestResponse(ValidationHelper::mapValidationErrorsToPlainString($errors));
         }
 
         $this->entityManager->persist($company);
@@ -235,7 +235,7 @@ final class CompanyController extends AbstractController
         $errors = $this->validator->validate($company);
 
         if ($errors->count() > 0) {
-            return $this->formatBadRequestResponse(FormHelper::mapValidationErrorsToPlainString($errors));
+            return $this->formatBadRequestResponse(ValidationHelper::mapValidationErrorsToPlainString($errors));
         }
 
         $this->entityManager->flush();

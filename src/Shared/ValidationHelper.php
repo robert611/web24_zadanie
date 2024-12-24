@@ -6,7 +6,7 @@ namespace App\Shared;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class FormHelper
+class ValidationHelper
 {
     public static function mapValidationErrorsToPlainString(ConstraintViolationListInterface $errorsList): string
     {
@@ -17,5 +17,19 @@ class FormHelper
         }
 
         return trim($result);
+    }
+
+    public static function mapValidationErrorsToPlainArray(ConstraintViolationListInterface $errorsList): array
+    {
+        $result = [];
+
+        foreach ($errorsList as $error) {
+            $result[] = [
+                'field' => $error->getPropertyPath(),
+                'message' => $error->getMessage(),
+            ];
+        }
+
+        return $result;
     }
 }
