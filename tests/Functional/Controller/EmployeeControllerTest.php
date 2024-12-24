@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Controller;
 use App\Tests\Fixtures\Fixtures;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmployeeControllerTest extends WebTestCase
 {
@@ -75,5 +76,59 @@ final class EmployeeControllerTest extends WebTestCase
         self::assertEquals('Parkowa 7a', $responseContent[0]['company']['address']);
         self::assertEquals('Warszawa', $responseContent[0]['company']['city']);
         self::assertEquals('10-733', $responseContent[0]['company']['zipCode']);
+    }
+
+    /**
+     * @test
+     */
+    public function canShowSingleCompany(): void
+    {
+        // given
+        $company = $this->fixtures->aCompany(
+            "Marco Polo",
+            "6574839201",
+            "Lubelska 7a",
+            "Elbląg",
+            "35-733",
+        );
+
+        $employee = $this->fixtures->anEmployee(
+            $company,
+            "John",
+            "Mack",
+            "john.mack@example.com",
+            "+48 345 678 123"
+        );
+
+        // when
+        $this->client->request('GET', "/api/employees/{$employee->getId()}");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertResponseIsSuccessful();
+        self::assertEquals($company->getId(), $responseContent['company']['id']);
+        self::assertEquals('John', $responseContent['firstName']);
+        self::assertEquals('Mack', $responseContent['lastName']);
+        self::assertEquals('john.mack@example.com', $responseContent['email']);
+        self::assertEquals('+48 345 678 123', $responseContent['phoneNumber']);
+    }
+
+    /**
+     * @test
+     */
+    public function willHandle404ForSingleEmployee(): void
+    {
+        // when
+        $this->client->request('GET', "/api/employees/100");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertEquals(['message' => 'Employee not found'], $responseContent['developerMessage']);
+        self::assertEquals(['message' => 'Employee not found'], $responseContent['userMessage']);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $responseContent['errorCode']);
+        self::assertEquals('Please look into api/doc for more information.', $responseContent['moreInfo']);
     }
 }

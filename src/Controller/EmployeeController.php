@@ -92,4 +92,44 @@ final class EmployeeController extends AbstractController
 
         return new JsonResponse($employee, Response::HTTP_CREATED);
     }
+
+    #[Route('/{id}', name: 'employee_show', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns single employee',
+        content: new OA\JsonContent(
+            ref: new Model(type: Employee::class, groups: ['employee_read'])
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'Employee id',
+        in: 'path',
+        schema: new OA\Schema(type: 'string')
+    )]
+    public function show(int $id): Response
+    {
+        $employee = $this->employeeRepository->find($id);
+
+        if (null === $employee) {
+            return $this->formatEmployeeNotFoundResponse();
+        }
+
+        return new JsonResponse($employee, Response::HTTP_OK);
+    }
+
+    public function formatEmployeeNotFoundResponse(): JsonResponse
+    {
+        return new JsonResponse([
+            'developerMessage' => [
+                'message' => 'Employee not found',
+            ],
+            'userMessage' => [
+                'message' => 'Employee not found',
+            ],
+            'errorCode' => Response::HTTP_NOT_FOUND,
+            'moreInfo' => 'Please look into api/doc for more information.'
+        ], Response::HTTP_NOT_FOUND);
+    }
+
 }

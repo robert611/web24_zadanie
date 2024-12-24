@@ -66,7 +66,6 @@ final class CompanyControllerTest extends WebTestCase
         self::assertEquals('20-456', $responseContent[1]['zipCode']);
     }
 
-
     /**
      * @test
      */
