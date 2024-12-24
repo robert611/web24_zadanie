@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Employee;
 use App\Repository\EmployeeRepository;
+use App\Resolver\EditEmployeeDTOResolver;
 use App\Resolver\EmployeeDTOResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -52,7 +53,7 @@ final class EmployeeController extends AbstractController
                     new OA\Property(property: 'firstName', type: 'string'),
                     new OA\Property(property: 'lastName', type: 'string'),
                     new OA\Property(property: 'email', type: 'string'),
-                    new OA\Property(property: 'phoneNumber', type: 'string'),
+                    new OA\Property(property: 'phoneNumber', type: 'string', nullable: true),
                 ],
                 type: 'object',
             ),
@@ -114,6 +115,57 @@ final class EmployeeController extends AbstractController
         if (null === $employee) {
             return $this->formatEmployeeNotFoundResponse();
         }
+
+        return new JsonResponse($employee, Response::HTTP_OK);
+    }
+
+    #[Route('/{id}', name: 'employee_edit', methods: ['PUT'])]
+    #[OA\Put(
+        description: 'Updates employee',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'firstName', type: 'string'),
+                    new OA\Property(property: 'lastName', type: 'string'),
+                    new OA\Property(property: 'email', type: 'string'),
+                    new OA\Property(property: 'phoneNumber', type: 'string', nullable: true),
+                ],
+                type: 'object',
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Updated employee',
+                content: new OA\JsonContent(
+                    ref: new Model(type: Employee::class, groups: ['employee_read'])
+                ),
+            ),
+        ],
+    )]
+    public function edit(int $id, Request $request, EditEmployeeDTOResolver $editEmployeeDTOResolver): Response
+    {
+        $employee = $this->employeeRepository->find($id);
+
+        if (null === $employee) {
+            return $this->formatEmployeeNotFoundResponse();
+        }
+
+        if ($jsonResponse = $editEmployeeDTOResolver->hasInvalidPayload($request)) {
+            return $jsonResponse;
+        }
+
+        $editEmployeeDTO = $editEmployeeDTOResolver->resolve($request);
+
+        $employee->update(
+            $editEmployeeDTO->getFirstName(),
+            $editEmployeeDTO->getLastName(),
+            $editEmployeeDTO->getEmail(),
+            $editEmployeeDTO->getPhoneNumber(),
+        );
+
+        $this->entityManager->flush();
 
         return new JsonResponse($employee, Response::HTTP_OK);
     }

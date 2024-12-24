@@ -111,6 +111,18 @@ class Employee implements JsonSerializable
         return $employee;
     }
 
+    public function update(
+        string $firstName,
+        string $lastName,
+        string $email,
+        ?string $phoneNumber,
+    ): void {
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->email = $email;
+        $this->phoneNumber = $phoneNumber;
+    }
+
     public function addToCompany(Company $company): void
     {
         $this->company = $company;
