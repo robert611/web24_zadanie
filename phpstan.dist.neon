@@ -7,5 +7,6 @@ parameters:
         - vendor/autoload.php
     ignoreErrors:
         - '#Property App\\Entity\\Company::\$id is never written, only read.#'
+        - '#Property App\\Entity\\Employee::\$id is never written, only read.#'
     excludePaths:
         - tests/bootstrap.php

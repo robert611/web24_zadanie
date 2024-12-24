@@ -58,6 +58,9 @@ class EditEmployeeDTOResolver
         );
     }
 
+    /**
+     * @param string|array<int, array{field: string, message: string}> $message
+     */
     private function formatBadRequestResponse(string|array $message): JsonResponse
     {
         if (is_string($message)) {

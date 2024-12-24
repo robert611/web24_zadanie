@@ -19,6 +19,9 @@ class ValidationHelper
         return trim($result);
     }
 
+    /**
+     * @return array<int, array{field: string, message: string}>
+     */
     public static function mapValidationErrorsToPlainArray(ConstraintViolationListInterface $errorsList): array
     {
         $result = [];

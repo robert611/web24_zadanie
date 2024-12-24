@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Repository\CompanyRepository;
+use App\Repository\EmployeeRepository;
 use App\Tests\Fixtures\Fixtures;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -15,12 +16,14 @@ final class CompanyControllerTest extends WebTestCase
     private KernelBrowser $client;
     private Fixtures $fixtures;
     private CompanyRepository $companyRepository;
+    private EmployeeRepository $employeeRepository;
 
     public function setUp(): void
     {
         $this->client = self::createClient();
         $this->fixtures = self::getContainer()->get(Fixtures::class);
         $this->companyRepository = self::getContainer()->get(CompanyRepository::class);
+        $this->employeeRepository = self::getContainer()->get(EmployeeRepository::class);
     }
 
     public function testList(): void
@@ -127,6 +130,23 @@ final class CompanyControllerTest extends WebTestCase
             "35-733",
         );
 
+        // and given
+        $this->fixtures->anEmployee(
+            $company,
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+48 444 656 434"
+        );
+
+        $this->fixtures->anEmployee(
+            $company,
+            "Brian",
+            "Kowalski",
+            "brian.kowalski@example.com",
+            "+48 132 456 469"
+        );
+
         // when
         $this->client->request('DELETE', "/api/companies/{$company->getId()}");
 
@@ -137,6 +157,7 @@ final class CompanyControllerTest extends WebTestCase
 
         // and then
         self::assertEquals(0, $this->companyRepository->count());
+        self::assertEquals(0, $this->employeeRepository->count());
     }
 
     /**

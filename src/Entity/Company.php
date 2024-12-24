@@ -88,6 +88,7 @@ class Company implements JsonSerializable
     private DateTimeImmutable $updatedAt;
 
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'company', cascade: ['persist', 'remove'])]
+    /** @phpstan-ignore-next-line */
     private Collection $employees;
 
     public function __construct()
@@ -135,6 +136,9 @@ class Company implements JsonSerializable
         return $this->updatedAt;
     }
 
+    /**
+     * @return Collection<int, Employee>
+     */
     public function getEmployees(): Collection
     {
         return $this->employees;
