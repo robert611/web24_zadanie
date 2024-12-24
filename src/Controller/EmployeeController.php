@@ -170,6 +170,34 @@ final class EmployeeController extends AbstractController
         return new JsonResponse($employee, Response::HTTP_OK);
     }
 
+    #[Route('/{id}', name: 'employee_delete', methods: ['DELETE'])]
+    #[OA\Delete(
+        description: 'Deletes employee',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Employee id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+    )]
+    public function delete(int $id): Response
+    {
+        $employee = $this->employeeRepository->find($id);
+
+        if (null === $employee) {
+            return $this->formatEmployeeNotFoundResponse();
+        }
+
+        $this->entityManager->remove($employee);
+        $this->entityManager->flush();
+
+        return new JsonResponse('Employee removed', Response::HTTP_NO_CONTENT);
+    }
+
+
     public function formatEmployeeNotFoundResponse(): JsonResponse
     {
         return new JsonResponse([
@@ -183,5 +211,4 @@ final class EmployeeController extends AbstractController
             'moreInfo' => 'Please look into api/doc for more information.'
         ], Response::HTTP_NOT_FOUND);
     }
-
 }

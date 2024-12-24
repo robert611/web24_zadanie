@@ -244,6 +244,18 @@ final class CompanyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'company_delete', methods: ['DELETE'])]
+    #[OA\Delete(
+        description: 'Deletes company',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Company id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+    )]
     public function delete(int $id): Response
     {
         $company = $this->companyRepository->find($id);

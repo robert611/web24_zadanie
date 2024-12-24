@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
+use App\Repository\EmployeeRepository;
 use App\Tests\Fixtures\Fixtures;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -13,11 +14,13 @@ final class EmployeeControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private Fixtures $fixtures;
+    private EmployeeRepository $employeeRepository;
 
     public function setUp(): void
     {
         $this->client = self::createClient();
         $this->fixtures = self::getContainer()->get(Fixtures::class);
+        $this->employeeRepository = self::getContainer()->get(EmployeeRepository::class);
     }
 
     public function testList(): void
@@ -121,6 +124,58 @@ final class EmployeeControllerTest extends WebTestCase
     {
         // when
         $this->client->request('GET', "/api/employees/100");
+
+        $responseContent = json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertEquals(['message' => 'Employee not found'], $responseContent['developerMessage']);
+        self::assertEquals(['message' => 'Employee not found'], $responseContent['userMessage']);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $responseContent['errorCode']);
+        self::assertEquals('Please look into api/doc for more information.', $responseContent['moreInfo']);
+    }
+
+    /**
+     * @test
+     */
+    public function canDeleteEmployee(): void
+    {
+        // given
+        $company = $this->fixtures->aCompany(
+            "Marco Polo",
+            "6574839201",
+            "Lubelska 7a",
+            "Elbląg",
+            "35-733",
+        );
+
+        $employee = $this->fixtures->anEmployee(
+            $company,
+            "John",
+            "Mack",
+            "john.mack@example.com",
+            "+48 345 678 123"
+        );
+
+        // when
+        $this->client->request('DELETE', "/api/employees/{$employee->getId()}");
+
+        json_decode($this->client->getResponse()->getContent(), true);
+
+        // then
+        self::assertResponseIsSuccessful();
+
+        // and then
+        self::assertEquals(0, $this->employeeRepository->count());
+    }
+
+    /**
+     * @test
+     */
+    public function willHandle404ForDeleteCompany(): void
+    {
+        // when
+        $this->client->request('DELETE', "/api/employees/105");
 
         $responseContent = json_decode($this->client->getResponse()->getContent(), true);
 
